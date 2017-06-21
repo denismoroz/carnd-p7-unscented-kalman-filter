@@ -61,12 +61,30 @@ public:
   ///* State dimension
   int n_x_;
 
+	///* Nubmer of sigma points
+	int n_sig_;
+	
+
   ///* Augmented state dimension
   int n_aug_;
 
   ///* Sigma point spreading parameter
   double lambda_;
 
+	///* Radar measurement noise covariance matrix
+  MatrixXd R_radar_;
+
+  ///* Lidar measurement noise covariance matrix
+	MatrixXd R_lidar_;
+	
+	
+  ///* the current NIS for radar
+  double NIS_radar_;
+	
+
+  ///* the current NIS for laser
+	double NIS_laser_;
+	
 
   /**
    * Constructor
@@ -82,7 +100,7 @@ public:
    * ProcessMeasurement
    * @param meas_package The latest measurement data of either radar or laser
    */
-  void ProcessMeasurement(MeasurementPackage meas_package);
+  void ProcessMeasurement(const MeasurementPackage& meas_package);
 
   /**
    * Prediction Predicts sigma points, the state, and the state covariance
@@ -95,13 +113,21 @@ public:
    * Updates the state and the state covariance matrix using a laser measurement
    * @param meas_package The measurement at k+1
    */
-  void UpdateLidar(MeasurementPackage meas_package);
+  void UpdateLidar(const MeasurementPackage &meas_package);
 
   /**
    * Updates the state and the state covariance matrix using a radar measurement
    * @param meas_package The measurement at k+1
    */
-  void UpdateRadar(MeasurementPackage meas_package);
+  void UpdateRadar(const MeasurementPackage &meas_package);
+private:
+	void GenerateSigmaPoints(MatrixXd& Xsig);
+	void PredictSigmaPoints(double delta_t, const MatrixXd& Xsig);
+	void PredictMeanAndCovariance();
+
+
+  void UpdateUKF(const MeasurementPackage &meas_package,const  MatrixXd &Zsig, int n_z);
+	
 };
 
 #endif /* UKF_H */
